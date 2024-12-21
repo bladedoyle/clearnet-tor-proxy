@@ -1,0 +1,66 @@
+---
+version: '3.4'
+
+networks:
+  proxy:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.10.0.0/24"
+          gateway: "10.10.0.1"
+
+
+services:
+  nginx:
+    image: nginx_proxy:latest
+    build:
+      context: nginx
+    container_name: nginx_proxy
+    networks:
+      proxy:
+        ipv4_address: 10.10.0.2
+    ports:
+      - 8888:80/tcp
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    restart: unless-stopped
+
+  socat:
+    image: socat_proxy:latest
+    build:
+      context: socat
+    container_name: socat_proxy
+    networks:
+      proxy:
+        ipv4_address: 10.10.0.3
+    environment:
+      - HIDDEN_SERVICE_ADDRESS=${HIDDEN_SERVICE_ADDRESS}
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    restart: unless-stopped
+
+  tor:
+    image: tor_proxy:latest
+    build:
+      context: tor
+    container_name: tor_proxy
+    networks:
+      proxy:
+        ipv4_address: 10.10.0.4
+    cap_add:
+      - NET_ADMIN
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    restart: unless-stopped
+
