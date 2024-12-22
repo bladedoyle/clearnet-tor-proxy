@@ -26,7 +26,7 @@ https://docs.docker.com/compose/install/
 `docker compose build`
 
 * Run the project
-`docker compose run`
+`docker compose up`
 
 * Verify:
 Open https://localhost:8888 in your clearnet web browser.
